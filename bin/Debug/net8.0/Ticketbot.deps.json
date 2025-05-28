@@ -1,0 +1,77 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Ticketbot/1.0.0": {
+        "dependencies": {
+          "Selenium.WebDriver": "4.33.0",
+          "Selenium.WebDriver.ChromeDriver": "137.0.7151.5500",
+          "Tesseract": "5.2.0"
+        },
+        "runtime": {
+          "Ticketbot.dll": {}
+        }
+      },
+      "Selenium.WebDriver/4.33.0": {
+        "runtime": {
+          "lib/net8.0/WebDriver.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.0.0.0"
+          }
+        }
+      },
+      "Selenium.WebDriver.ChromeDriver/137.0.7151.5500": {},
+      "System.Reflection.Emit/4.7.0": {},
+      "Tesseract/5.2.0": {
+        "dependencies": {
+          "System.Reflection.Emit": "4.7.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Tesseract.dll": {
+            "assemblyVersion": "5.2.0.0",
+            "fileVersion": "5.2.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Ticketbot/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Selenium.WebDriver/4.33.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-5dzwA1cMorwYWudX46zyeUqyZn48TZeCHbSERxbpKezGxZ8hMBpcL12XwG4RGUuQKGH8FiEOJOFK4eCE//uNpQ==",
+      "path": "selenium.webdriver/4.33.0",
+      "hashPath": "selenium.webdriver.4.33.0.nupkg.sha512"
+    },
+    "Selenium.WebDriver.ChromeDriver/137.0.7151.5500": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VcbeR20B7qLPC9/zgGf3DJbxsJEhlTviQn9qjvl7kii4qtufUM6feb3Kp36MITY0uKzUBhxYMDRiDe7VEbQgAw==",
+      "path": "selenium.webdriver.chromedriver/137.0.7151.5500",
+      "hashPath": "selenium.webdriver.chromedriver.137.0.7151.5500.nupkg.sha512"
+    },
+    "System.Reflection.Emit/4.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VR4kk8XLKebQ4MZuKuIni/7oh+QGFmZW3qORd1GvBq/8026OpW501SzT/oypwiQl4TvT8ErnReh/NzY9u+C6wQ==",
+      "path": "system.reflection.emit/4.7.0",
+      "hashPath": "system.reflection.emit.4.7.0.nupkg.sha512"
+    },
+    "Tesseract/5.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-YB7feJlrTWSXtK8+WaCcseGSPK/1r2d2FWeKGyndlrPwYClrzTlCoHD4/oQEUjKafmpkWlhTZZ7pxiRJYZgj6w==",
+      "path": "tesseract/5.2.0",
+      "hashPath": "tesseract.5.2.0.nupkg.sha512"
+    }
+  }
+}
