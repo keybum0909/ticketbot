@@ -7,6 +7,20 @@ class Program
 {
     static void Main(string[] args)
     {
+        // 購票網址
+        string ticketUrl = "https://tixcraft.com/activity/detail/25_wubaikh";
+        // 日期
+        string date = "2025/11/22 (六) 19:30";
+        //座位區
+        string seat = "特2區4200";
+        //張數
+        int quantity = 4;
+
+        //信用卡內容
+        string cardNumber = "1234567891234567";
+        string cardMonth = "3";
+        string cardYear = "29";
+
         var options = new ChromeOptions();
         options.AddArgument("--ignore-certificate-errors");
         options.AddArgument("--disable-blink-features=AutomationControlled");
@@ -17,12 +31,11 @@ class Program
         driver.Navigate().GoToUrl("https://tixcraft.com/login");
 
         // 2. 點選 Facebook 登入（可能需判斷是否已有 cookie）
-        var fbBtn = driver.FindElement(By.Id("facebook"));
-        fbBtn.Click();
+        driver.FindElement(By.Id("facebook")).Click();
 
         // 3. Facebook 登入頁，填寫帳密
-        driver.FindElement(By.Id("email")).SendKeys("wendy91520@yahoo.com.tw");
-        driver.FindElement(By.Id("pass")).SendKeys("@wendy**91520@");
+        driver.FindElement(By.Id("email")).SendKeys("mail@yahoo.com.tw");
+        driver.FindElement(By.Id("pass")).SendKeys("P@ssw0rd");
         driver.FindElement(By.Name("login")).Click();
 
         // 4. 驗證碼辨識
@@ -50,15 +63,14 @@ class Program
 
         // 6. 取得 Cookie（包含 SESSID）
         // 持續等待直到網址包含 "tixcraft.com"
-        string currentUrl = "";
         while (true)
         {
-            currentUrl = driver.Url;
-            Console.WriteLine($"目前網址：{currentUrl}");
-
-            if (currentUrl.Contains("https://tixcraft.com"))
+            if (driver.Url == ticketUrl)
             {
                 driver.FindElement(By.Id("onetrust-accept-btn-handler")).Click();
+                WarStart(driver, date, seat, quantity);
+
+                PayTicket(driver, cardNumber, cardMonth, cardYear);
                 break; // 網址符合條件就跳出迴圈
             }
 
@@ -76,13 +88,89 @@ class Program
             Console.WriteLine($"{cookie.Name} = {cookie.Value}");
         }
 
-        driver.Navigate().GoToUrl("https://tixcraft.com/activity/detail/25_valley");
-        driver.FindElement(By.CssSelector("li.buy a")).Click();
-
-        
-
-
-        // 6. 把 SESSID 存起來用來打 API
         //driver.Quit();
+    }
+
+    public static void WarStart(IWebDriver driver, string date, string seat, int quantity){
+        //7. 立即購票、點選場次
+        var link = driver.FindElement(By.CssSelector("li.buy a"));
+        string href = link.GetAttribute("href");
+        driver.Navigate().GoToUrl(href);
+
+        var rows = driver.FindElements(By.TagName("tr"));
+        IWebElement targetRow = null;
+        Console.WriteLine($"找到 {rows.Count} 行列");
+
+        foreach (var row in rows)
+        {
+            if (row.Text.Contains(date))
+            {
+                targetRow = row;
+                targetRow.FindElement(By.CssSelector("button[data-href]")).Click();
+                break;
+            }
+        }
+
+        //8. 點選座位 (電腦選位)
+        var li = driver.FindElement(By.XPath($"//li[a[contains(., '{seat}')]]"));
+        li.FindElement(By.TagName("a")).Click();
+
+        //9. 點選張數與驗證碼
+        //driver.FindElement(By.XPath($"//select[option[text()='{quantity}']]"));
+        var select = driver.FindElement(By.TagName("select"));
+        select.FindElement(By.CssSelector($"option[value='{quantity}']")).Click();
+        var checkbox = driver.FindElement(By.Id("TicketForm_agree"));
+        IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+        js.ExecuteScript("arguments[0].click();", checkbox);
+
+        // string code = GetCaptchaText(driver);
+        // Console.WriteLine($"辨識出的驗證碼：{code}");
+
+    }
+
+    public static string GetCaptchaText(IWebDriver driver)
+    {
+        // 取得驗證碼圖片元素
+        var captchaImage = driver.FindElement(By.Id("TicketForm_verifyCode-image"));
+        var imageSrc = captchaImage.GetAttribute("src");
+
+        // 下載圖片
+        using (var webClient = new System.Net.WebClient())
+        {
+            byte[] imageBytes = webClient.DownloadData(imageSrc);
+            using (var ms = new System.IO.MemoryStream(imageBytes))
+            {
+                // 使用 Tesseract OCR 辨識文字
+                using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+                {
+                    using (var img = Pix.LoadFromMemory(ms.ToArray()))
+                    {
+                        var result = engine.Process(img);
+                        return result.GetText().Trim();
+                    }
+                }
+            }
+        }
+    }
+
+    public static void PayTicket(IWebDriver driver, string cardNumber, string cardMonth, string cardYear)
+    {
+        while (true)
+        {
+            if (driver.Url == "https://epos.cloud.cathaybk.com.tw/EPOSPayment/#/paymentProcessing/orderpayment")
+            {
+                // 卡號
+                driver.FindElement(By.Id("cardNumber")).SendKeys(cardNumber);
+                var monthSelect = driver.FindElement(By.Id("ExpirationMonth"));
+                monthSelect.FindElement(By.CssSelector($"option[value='{cardMonth}']")).Click();
+
+                var yearSelect = driver.FindElement(By.Id("ExpirationYear"));
+                yearSelect.FindElement(By.CssSelector($"option[value='{cardYear}']")).Click();
+
+                driver.FindElement(By.Id("check_num")).SendKeys("695");
+            }
+
+            Thread.Sleep(1000); // 每秒檢查一次
+        }
     }
 }
